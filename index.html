@@ -15,7 +15,7 @@ header{padding:18px 6%;display:flex;justify-content:space-between;align-items:ce
 .workspace{display:none}.workspace h2{margin-top:0}.tool p{color:#aab2c5;line-height:1.5}.tool button{background:#7c5cff;color:#fff}
 .panel{display:none;margin-top:22px;background:#151d31;border:1px solid #303a55;border-radius:16px;padding:22px}.panel h3{margin-top:0}
 label{display:block;margin:12px 0 6px;color:#b8c0d1}input,select,textarea{width:100%;padding:12px;border-radius:9px;border:1px solid #39445f;background:#0e1527;color:#fff}textarea{min-height:120px;resize:vertical}
-.generate{margin-top:16px;background:#7c5cff;color:#fff}.result{margin-top:18px;padding:18px;background:#0e1527;border-radius:12px;white-space:pre-wrap;line-height:1.6}
+.generate{margin-top:16px;background:#7c5cff;color:#fff}.result{margin-top:18px;padding:18px;background:#0e1527;border-radius:12px;white-space:pre-wrap;line-height:1.6}.connected{padding:14px;border-radius:10px;background:#12351f;border:1px solid #2d7a46;margin-top:12px}.error{padding:14px;border-radius:10px;background:#3a1720;border:1px solid #8b3345;margin-top:12px}.muted{color:#aab2c5}
 .features{padding:55px 6%;background:#0f1526}.features h2{text-align:center}.grid{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.feature{background:#171f33;padding:22px;border-radius:15px}.feature p{color:#9ca6bb;line-height:1.5}
 footer{text-align:center;padding:28px;color:#778198}
 @media(max-width:700px){.cards,.tools,.grid{grid-template-columns:1fr}.hero{padding:50px 6%}.dashboard,.workspace{margin:15px auto}}
@@ -107,9 +107,7 @@ footer{text-align:center;padding:28px;color:#778198}
 <small>Choose where the campaign will run</small>
 <select id="adAccount">
 
-<option value="">Select an ad account</option>
-
-<option value="Demo Business Ad Account">Demo Business Ad Account</option>
+<option value="">Connect Meta to load ad accounts</option>
 
 </select>
 
@@ -183,90 +181,108 @@ Connect Meta
 <footer>© 2026 MarketAI — Your Marketing Platform</footer>
 
 <script>
-function startApp(){document.getElementById("hero").style.display="none";document.getElementById("overview").style.display="none";document.getElementById("workspace").style.display="block";window.scrollTo(0,0)}
+async function startApp(){document.getElementById("hero").style.display="none";document.getElementById("overview").style.display="none";document.getElementById("workspace").style.display="block";window.scrollTo(0,0);await refreshMetaStatus()}
 function hidePanels(){["contentTool","analyticsPanel","campaignPanel"].forEach(id=>document.getElementById(id).style.display="none")}
 function openContentTool(){hidePanels();document.getElementById("contentTool").style.display="block";document.getElementById("contentTool").scrollIntoView({behavior:"smooth"})}
 function openAnalytics(){hidePanels();document.getElementById("analyticsPanel").style.display="block";document.getElementById("analyticsPanel").scrollIntoView({behavior:"smooth"})}
-function openCampaigns(){hidePanels();document.getElementById("campaignPanel").style.display="block";document.getElementById("campaignPanel").scrollIntoView({behavior:"smooth"})}
+function openCampaigns(){hidePanels();document.getElementById("campaignPanel").style.display="block";document.getElementById("campaignPanel").scrollIntoView({behavior:"smooth"});refreshMetaStatus()}
 function generateContent(){
  const branch=document.getElementById("branch").value, service=document.getElementById("service").value||"our services", audience=document.getElementById("audience").value||"customers in "+branch, platform=document.getElementById("platform").value, tone=document.getElementById("tone").value;
  document.getElementById("contentResult").textContent=`${tone} ${platform} post — ${branch}\n\nLooking for reliable ${service}? Electrical Suppliers is here to help.\n\nWe provide trusted electrical solutions for ${audience}. From electrical services and solar to air conditioning, ventilation and cameras, our team can help you find the right solution.\n\n📍 Serving ${branch}\n💬 Contact us on WhatsApp for a quote or enquiry.\n\n#ElectricalSuppliers #${branch.replace(/\s/g,"")} #${service.replace(/\s/g,"")}`;
 }
 function createCampaign(){
  const name=document.getElementById("campaignName").value||"New campaign",budget=document.getElementById("budget").value,goal=document.getElementById("goal").value,branch=document.getElementById("branch").value;
- document.getElementById("campaignResult").textContent=`Campaign: ${name}\nBranch: ${branch}\nDaily budget: R${budget}\nGoal: ${goal}\n\nNext step: connect this campaign to Meta Ads so it can be launched.`;
- document.getElementById("campaignCount").textContent="4";
+ document.getElementById("campaignResult").textContent=`Campaign: ${name}\nBranch: ${branch}\nDaily budget: R${budget}\nGoal: ${goal}\n\nNext step: connect Meta, select a real ad account, review, and create the campaign in Meta.`;
 }
-function connectMeta() {
-const status = document.getElementById("metaStatus");
-
-status.innerHTML = `
-<div class="connected">
-✅ Meta connected
-<br>
-<small>Facebook + Instagram advertising accounts connected.</small>
-</div>
-`;
-
-document.getElementById("step2").classList.add("complete");
-document.getElementById("step3").style.display = "block";
+async function refreshMetaStatus(){
+ try {
+   const response=await fetch('/api/meta/status');
+   const data=await response.json();
+   const status=document.getElementById('metaStatus');
+   if(!data.configured){
+     status.innerHTML='<div class="muted">Meta integration is not configured yet. Add the values from <code>.env</code>.</div>';
+     return;
+   }
+   if(data.connected){
+     status.innerHTML='<div class="connected">✅ Meta connected<br><small>Facebook & Instagram advertising access is connected to this session.</small></div>';
+     document.getElementById('step2').classList.add('complete');
+     document.getElementById('step3').style.display='block';
+     await loadAdAccounts();
+   } else {
+     status.innerHTML='<div class="muted">Click Connect Meta to authorize MarketAI.</div>';
+   }
+ } catch(error) {
+   document.getElementById('metaStatus').innerHTML=`<div class="error">Unable to check Meta connection: ${escapeHtml(error.message)}</div>`;
+ }
 }
-function selectAdAccount() {
-const account = document.getElementById("adAccount").value;
-const status = document.getElementById("adAccountStatus");
-
-if (!account) {
-status.textContent = "Please select an ad account.";
-return;
+function connectMeta(){ window.location.href='/auth/meta'; }
+async function loadAdAccounts(){
+ const select=document.getElementById('adAccount');
+ const status=document.getElementById('adAccountStatus');
+ select.innerHTML='<option value="">Loading ad accounts…</option>';
+ try{
+   const response=await fetch('/api/meta/adaccounts');
+   const data=await response.json();
+   if(!response.ok) throw new Error(data.error||'Could not load ad accounts.');
+   select.innerHTML='<option value="">Select an ad account</option>';
+   for(const account of data.accounts||[]){
+     const option=document.createElement('option');
+     option.value=account.id;
+     option.textContent=`${account.name || account.id}${account.currency ? ` — ${account.currency}` : ''}`;
+     option.dataset.name=account.name || account.id;
+     select.appendChild(option);
+   }
+   if(!(data.accounts||[]).length){
+     status.innerHTML='<div class="error">No ad accounts were returned. Check that your Meta user has access to an ad account and that the app has the required permissions.</div>';
+   }
+ }catch(error){
+   select.innerHTML='<option value="">Unable to load ad accounts</option>';
+   status.innerHTML=`<div class="error">${escapeHtml(error.message)}</div>`;
+ }
 }
-
-status.innerHTML = `
-<div class="connected">
-✅ Ad account selected
-<br>
-<small>${account}</small>
-</div>
-`;
-
-document.getElementById("step3").classList.add("complete");
-document.getElementById("step4").style.display = "block";
+async function selectAdAccount(){
+ const select=document.getElementById("adAccount");
+ const account=select.value;
+ const status=document.getElementById("adAccountStatus");
+ if(!account){status.innerHTML='<div class="error">Please select an ad account.</div>';return;}
+ const name=select.options[select.selectedIndex].dataset.name || select.options[select.selectedIndex].textContent;
+ status.innerHTML=`<div class="connected">✅ Ad account selected<br><small>${escapeHtml(name)} (${escapeHtml(account)})</small></div>`;
+ document.getElementById("step3").classList.add("complete");
+ document.getElementById("step4").style.display="block";
 }
-function reviewCampaign() {
-const name = document.getElementById("campaignName").value || "New campaign";
-const budget = document.getElementById("budget").value || "0";
-const goal = document.getElementById("goal").value || "Not selected";
-const account = document.getElementById("adAccount").value || "Not selected";
-
-document.getElementById("campaignReview").innerHTML = `
-<strong>Campaign ready for launch</strong>
-<br><br>
-Campaign: ${name}
-<br>
-Daily budget: R${budget}
-<br>
-Goal: ${goal}
-<br>
-Ad account: ${account}
-<br><br>
-<span>✅ Meta connected</span>
-`;
-
-document.getElementById("step4").classList.add("complete");
-document.getElementById("step5").style.display = "block";
+function reviewCampaign(){
+ const name=document.getElementById("campaignName").value||"New campaign";
+ const budget=document.getElementById("budget").value||"0";
+ const goal=document.getElementById("goal").value||"Not selected";
+ const select=document.getElementById("adAccount");
+ const account=select.value||"Not selected";
+ const accountName=account && select.selectedIndex>=0 ? (select.options[select.selectedIndex].dataset.name || select.options[select.selectedIndex].textContent) : "Not selected";
+ document.getElementById("campaignReview").innerHTML=`<strong>Campaign ready for Meta</strong><br><br>Campaign: ${escapeHtml(name)}<br>Daily budget target: R${escapeHtml(budget)}<br>Goal: ${escapeHtml(goal)}<br>Ad account: ${escapeHtml(accountName)}<br><br><span>✅ Meta connected</span><br><br><small class="muted">The current integration creates the campaign object in Meta as PAUSED. A live ad set, audience, creative and destination are still required before delivery.</small>`;
+ document.getElementById("step4").classList.add("complete");
+ document.getElementById("step5").style.display="block";
 }
-function launchCampaign() {
-const status = document.getElementById("launchStatus");
-
-status.innerHTML = `
-<div class="connected">
-🚀 Campaign launched successfully
-<br>
-<small>Your campaign has been sent to Meta.</small>
-</div>
-`;
-
-document.getElementById("step5").classList.add("complete");
+async function launchCampaign(){
+ const status=document.getElementById("launchStatus");
+ const adAccountId=document.getElementById("adAccount").value;
+ const name=document.getElementById("campaignName").value||"New campaign";
+ const budget=document.getElementById("budget").value;
+ const goal=document.getElementById("goal").value;
+ if(!adAccountId){status.innerHTML='<div class="error">Select an ad account first.</div>';return;}
+ status.innerHTML='<div class="muted">Creating campaign in Meta…</div>';
+ try{
+   const response=await fetch('/api/meta/campaigns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adAccountId,name,budget,goal})});
+   const data=await response.json();
+   if(!response.ok) throw new Error(data.error||'Meta campaign creation failed.');
+   status.innerHTML=`<div class="connected">🚀 Campaign created in Meta<br><small>Campaign ID: ${escapeHtml(data.campaignId)}<br>Status: ${escapeHtml(data.status)}<br><br>${escapeHtml(data.message)}</small></div>`;
+   document.getElementById("step5").classList.add("complete");
+ }catch(error){
+   status.innerHTML=`<div class="error">❌ ${escapeHtml(error.message)}</div>`;
+ }
 }
+function escapeHtml(value){return String(value).replace(/[&<>'"]/g, char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));}
+
+// If Meta redirected back to this page, update the UI automatically.
+window.addEventListener('DOMContentLoaded',()=>refreshMetaStatus());
 </script>
 </body>
 </html>
