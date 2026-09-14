@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarketAI — Electrical Suppliers</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><div class="logo">Market<span>AI</span></div><button class="login" onclick="alert('Owner login will be connected to Supabase next.')">Owner Login</button></header>
+
+<section class="hero" id="hero">
+<h1>Smarter Marketing.<br><span>Powered by AI.</span></h1>
+<p>Manage advertising for Electrical Suppliers across Bethlehem and QwaQwa from one platform, with independent campaigns for each branch.</p>
+<button class="cta" onclick="startApp()">Open Marketing Workspace →</button>
+</section>
+
+<section class="dashboard" id="overview">
+<h2>Marketing Overview</h2>
+<div class="cards">
+<div class="card"><small>Campaigns</small><strong id="campaignCount">3</strong></div>
+<div class="card"><small>Reach</small><strong>48.2K</strong></div>
+<div class="card"><small>Engagement</small><strong>8.7%</strong></div>
+</div>
+</section>
+
+<section class="workspace" id="workspace">
+<h2>🚀 Marketing Workspace</h2>
+<p style="color:#aab2c5">Choose a branch, then create content, campaigns or review performance.</p>
+
+<label>Branch</label>
+<select id="branch"><option>Bethlehem</option><option>QwaQwa</option></select>
+
+<div class="tools" style="margin-top:20px">
+<div class="tool"><h3>✍️ AI Content</h3><p>Generate Facebook and social media copy for your selected branch.</p><button onclick="openContentTool()">Create Content</button></div>
+<div class="tool"><h3>📊 Analytics</h3><p>View a simple performance snapshot for your marketing.</p><button onclick="openAnalytics()">View Analytics</button></div>
+<div class="tool"><h3>🚀 Campaigns</h3><p>Build an advertising campaign with a local audience and budget.</p><button onclick="openCampaigns()">New Campaign</button></div>
+</div>
+
+<div class="panel" id="contentTool">
+<h3>✨ AI Content Generator</h3>
+<label>Service / offer</label><input id="service" placeholder="e.g. Solar installation">
+<label>Target audience</label><input id="audience" placeholder="e.g. Homeowners in Bethlehem">
+<label>Platform</label><select id="platform"><option>Facebook</option><option>Instagram</option><option>WhatsApp</option></select>
+<label>Tone</label><select id="tone"><option>Professional</option><option>Friendly</option><option>Exciting</option><option>Urgent</option></select>
+<button class="generate" onclick="generateContent()">Generate Content</button>
+<div class="result" id="contentResult">Your generated marketing post will appear here.</div>
+</div>
+
+<div class="panel" id="analyticsPanel">
+<h3>📊 Analytics</h3>
+<div class="cards">
+<div class="card"><small>Estimated reach</small><strong>48.2K</strong></div>
+<div class="card"><small>Engagement</small><strong>8.7%</strong></div>
+<div class="card"><small>Leads</small><strong>126</strong></div>
+</div>
+</div>
+
+<div class="panel" id="campaignPanel">
+<h3>🚀 Campaign Builder</h3>
+<label>Campaign name</label><input id="campaignName" placeholder="e.g. Bethlehem Solar Special">
+<label>Daily budget (R)</label><input id="budget" type="number" value="50" min="1">
+<label>Goal</label><select id="goal"><option>WhatsApp messages</option><option>Leads</option><option>Website visits</option><option>Brand awareness</option></select>
+<button class="generate" onclick="createCampaign()">Create Campaign</button>
+<div class="result" id="campaignResult">
+    <div class="launch-workflow" id="launchWorkflow">
+
+<h3>🚀 Launch Campaign</h3>
+
+<div class="workflow-steps">
+
+<div class="workflow-step complete" id="step1">
+<span class="step-number">✓</span>
+<div>
+<strong>Campaign details</strong>
+<small>Campaign information created</small>
+</div>
+</div>
+
+<div class="workflow-step" id="step2">
+<span class="step-number">2</span>
+<div>
+<strong>Connect Meta</strong>
+<small>Connect Facebook & Instagram advertising</small>
+</div>
+</div>
+
+<div class="workflow-step" id="step3">
+<span class="step-number">3</span>
+<div>
+<strong>Select ad account</strong>
+<small>Choose where the campaign will run</small>
+<select id="adAccount">
+
+<option value="">Select an ad account</option>
+
+<option value="Demo Business Ad Account">Demo Business Ad Account</option>
+
+</select>
+
+<button class="generate" onclick="selectAdAccount()">
+
+Continue
+
+</button>
+
+<div id="adAccountStatus"></div>
+</div>
+</div>
+
+<div class="workflow-step" id="step4">
+<span class="step-number">4</span>
+<div>
+<strong>Review campaign</strong>
+<small>Check everything before launch</small>
+<div id="campaignReview" class="review-box"></div>
+
+<button class="generate" onclick="reviewCampaign()">
+
+Review Campaign
+
+</button>
+</div>
+</div>
+
+<div class="workflow-step" id="step5">
+<span class="step-number">5</span>
+<div>
+<strong>Launch</strong>
+<small>Send the campaign to Meta</small>
+<button class="generate" onclick="launchCampaign()">
+
+🚀 Launch Campaign
+
+</button>
+
+<div id="launchStatus"></div>
+</div>
+</div>
+
+</div>
+
+<div class="connection-box" id="metaConnectionBox">
+<h4>🔵 Connect Meta</h4>
+
+<p>
+Connect your Facebook and Instagram advertising accounts
+to continue.
+</p>
+
+<button class="generate" onclick="connectMeta()">
+Connect Meta
+</button>
+
+<div id="metaStatus"></div>
+</div>
+
+</div>
+    Your campaign summary will appear here.</div>
+</div>
+</section>
+
+<section class="features"><h2>Built for Your Business</h2><div class="grid">
+<div class="feature"><h3>📍 Two Branches</h3><p>Run Bethlehem and QwaQwa campaigns independently while managing them from one owner platform.</p></div>
+<div class="feature"><h3>💬 WhatsApp Leads</h3><p>Prepare campaigns around WhatsApp enquiries and local customers.</p></div>
+<div class="feature"><h3>🤖 AI Marketing</h3><p>Generate practical advertising copy for electrical, solar, air conditioning, ventilation and camera services.</p></div>
+</div></section>
+<footer>© 2026 MarketAI — Your Marketing Platform</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#fff}
+button,input,select,textarea{font:inherit}button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
+header{padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #273047;background:#0b1020;position:sticky;top:0;z-index:5}
+.logo{font-size:22px;font-weight:800}.logo span{color:#7c5cff}.login{background:#20283b;color:#fff}
+.hero{text-align:center;padding:70px 6%}.hero h1{font-size:clamp(38px,7vw,68px);margin:0 0 18px}.hero h1 span{color:#7c5cff}.hero p{max-width:700px;margin:auto;color:#aab2c5;line-height:1.6;font-size:18px}.cta{margin-top:28px;background:#7c5cff;color:#fff}
+.dashboard,.workspace{max-width:1100px;margin:25px auto;padding:25px 6%}.dashboard{background:#12192b;border:1px solid #293149;border-radius:20px}
+.cards,.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card,.tool{background:#1a2235;padding:22px;border-radius:15px}.card small{color:#9ca6bb}.card strong{display:block;font-size:30px;margin-top:8px}
+.workspace{display:none}.workspace h2{margin-top:0}.tool p{color:#aab2c5;line-height:1.5}.tool button{background:#7c5cff;color:#fff}
+.panel{display:none;margin-top:22px;background:#151d31;border:1px solid #303a55;border-radius:16px;padding:22px}.panel h3{margin-top:0}
+label{display:block;margin:12px 0 6px;color:#b8c0d1}input,select,textarea{width:100%;padding:12px;border-radius:9px;border:1px solid #39445f;background:#0e1527;color:#fff}textarea{min-height:120px;resize:vertical}
+.generate{margin-top:16px;background:#7c5cff;color:#fff}.result{margin-top:18px;padding:18px;background:#0e1527;border-radius:12px;white-space:pre-wrap;line-height:1.6}
+.features{padding:55px 6%;background:#0f1526}.features h2{text-align:center}.grid{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.feature{background:#171f33;padding:22px;border-radius:15px}.feature p{color:#9ca6bb;line-height:1.5}
+footer{text-align:center;padding:28px;color:#778198}
+@media(max-width:700px){.cards,.tools,.grid{grid-template-columns:1fr}.hero{padding:50px 6%}.dashboard,.workspace{margin:15px auto}}
